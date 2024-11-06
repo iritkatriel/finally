@@ -83,6 +83,7 @@ class Reporter:
 
     def __init__(self):
         self.findings = []
+        self.lines = 0
 
     def report(self, source, filename, verbose):
         try:
@@ -92,6 +93,7 @@ class Reporter:
             return
 
         Visitor(source, filename, self.findings).visit(a)
+        self.lines += len(source.split(b'\n'))
 
     def file_report(self, filename, verbose):
         try:
@@ -167,6 +169,8 @@ def main():
                         reporter.file_report(full, verbose)
         else:
             print(f"{filename}: Cannot open")
+
+    print(f'total lines: {reporter.lines}')
 
 if __name__ == "__main__":
     main()

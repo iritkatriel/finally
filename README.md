@@ -134,7 +134,7 @@ Here the intention seems to be to return `NotImplemented` when an exception is
 raised, but the `return` in the `finally` block would override the one in the
 `except` block.
 
-## Author reactions
+### Author reactions
 
 Of the 149 incorrect instances of `return` or `break` in a `finally` clause, 27
 were out of date, in the sense that they do not appear in the main/master branch
@@ -152,6 +152,50 @@ One issue was linked to a pre-existing open issue about non-responsiveness to Ct
 conjecturing a connection.
 
 Two of the issue were labelled as "good first issue".
+
+### The correct usages
+
+The 8 cases where the feature appears to be used correctly (in non-test code) also
+deserve attention. These represent that "churn" that would be caused by blocking
+the feature, because this is where working code will need to change.  I did not
+contact the authors in these cases, so we will need to assess the difficulty of
+making these changes ourselves.
+
+- In [mosaicml](https://github.com/mosaicml/composer/blob/694e72159cf026b838ba00333ddf413185b4fb4f/composer/cli/launcher.py#L590)
+there is a return in a finally at the end of the `main` function, after an `except:`
+clause which swallows all exceptions. The return in the finally would swallow
+an exception raised from within the `except:` clause, but this seems to be the
+intention in this code. A possible fix would be to assign the return value to a
+variable in the `finally` clause, and dedent the return statement.
+
+- In [webtest](https://github.com/Pylons/webtest/blob/617a2b823c60e8d7c5f6e12a220affbc72e09d7d/webtest/http.py#L131)
+there is a `finally` block that contains only `return False`. It could be replaced
+by
+
+```pycon
+    except BaseException:
+        pass
+    return False
+```
+
+- In [kivy](https://github.com/kivy/kivy/blob/3b744c7ed274c1a99bd013fc55a5191ebd8a6a40/kivy/uix/codeinput.py#L204)
+there is a `finally` that contains only a `return` statement. Since there is also a
+bare `except` just before it, in this case the fix will be to just remove the `finally:` block
+and dedent the `return` statement.
+
+- In [logilab-common](https://forge.extranet.logilab.fr/open-source/logilab-common/-/blob/branch/default/test/data/module.py?ref_type=heads#L60)
+there is, once again, a `finally` clause that can be replace by an `except BaseException` with
+the `return` dedented one level.
+
+- In [pluggy](https://github.com/pytest-dev/pluggy/blob/c760a77e17d512c3572d54d368fe6c6f9a7ac810/src/pluggy/_callers.py#L141)
+there is a lengthy `finally` with two `return` statements (the second on line 182). Here the
+return value can be assigned to a variable, and the `return` itself can appear after we've
+exited the `finally` clause.
+
+- In [aws-sam-cli](https://github.com/aws/aws-sam-cli/blob/97e63dcc2738529eded8eecfef4b875abc3a476f/samcli/local/apigw/local_apigw_service.py#L721) there is a conditional return at the end of the block.
+From reading the code, it seems that the condition only holds when the exception has
+been handled (. And yet, the conditional block can just move outside of the `finally`
+block and achieve the same effect.
 
 ## Discussion
 

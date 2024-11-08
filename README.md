@@ -1,19 +1,52 @@
 # `return` in `finally` considered harmful
 
-### Abstract
+### TL;DR
 
 The semantics of `return`, `break` and `continue` in a `finally` block are
-surprising. This document describes an analysis of their use in real code
-(popular PyPI packages) which was condicted in order to assess the feasibility
-of blocking these features. The results show that
+surprising. This document describes an analysis of their use in real world
+code, which was conducted in order to assess the cost and benefit of blocking
+these features in future versions of Python. The results show that
 
-1. These patterns are not used often.
-2. When they are used, they are usually used incorrectly, leading to unintended
-   swallowing of exceptions.
-3. Code authors are overwhelmingly receptive and quick to fix the code when
+1. they are not used often.
+2. when used, they are usually used incorrectly.
+3. code authors are typically receptive and quick to fix the code when
    the error is pointed out to them.
 
+My conclusion is that it is both desireable and feasible to make this
+a `SyntaxWarning`, and laster a `SyntaxError`.
+
 ## Introduction
+
+The semantic of `return`, `break` and `continue` are surprising for many
+developers. The [documentation](https://docs.python.org/3/tutorial/errors.html#defining-clean-up-actions)
+mentions that
+
+- If the finally clause executes a break, continue or return statement, exceptions are not re-raised.
+- If a finally clause includes a return statement, the returned value will be the one
+from the finally clause’s return statement, not the value from the try clause’s return statement.
+
+Both of these behaviours cause confusion, but the first one is particularly dangerous
+becuase a swallowed exception is more likely to slip through testing, than an incorrect
+return value.
+
+In 2019, [PEP 601](https://peps.python.org/pep-0601/) proposed to change Python to emit a
+`SyntaxWarning` for a few releases and then turn it into a `SyntaxError`. The PEP was
+rejected in favour of viewing this as a programming style issue, to be handled by linters
+and [PEP8](https://peps.python.org/pep-0008/).
+Indeed, PEP8 now recommends not to used control flow statements in a `finally` block, and
+linters such as [pylint](https://pylint.readthedocs.io/en/stable/),
+[ruff](https://docs.astral.sh/ruff/) and
+[flake8-bugbear](https://github.com/PyCQA/flake8-bugbear) flag them as a problem.
+
+It is not disputed that `return`, `break` and `continue` in a `finally` clause
+should be avoided, the question is whether changing Python to forbid it now is worth
+the churn.  What was missing at the time that PEP 601 was rejected, was an understanding
+of how this issue manifests in practice. Are people using it? How often are they
+using it incorrectly? How much churn would the proposed change create?
+
+The purpose here is to bridge that gap by evaluating real code (the 8000 most popular
+packages on PyPI) to answer these question. I believe that the results show that PEP 601
+should now be implemented.
 
 ## Method
 
@@ -124,7 +157,7 @@ Two of the issue were labelled as "good first issue".
 
 The first thing to note is that `return`/`break`/`continue` in a `finally`
 block is not something we see often: 203 instance in over 120 million lines
-of code.
+of code. This is, possibly, thanks to the linters that warn about this.
 
 The second observation is that most of the usages were incorrect: 73% in our
 sample (149 of 203).

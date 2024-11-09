@@ -2,6 +2,8 @@
 
 Irit Katriel
 
+[Discussion link](https://discuss.python.org/t/an-analysis-of-return-in-finally-in-the-wild/70633).
+
 ### TL;DR
 
 The semantics of `return`, `break` and `continue` in a `finally` block are

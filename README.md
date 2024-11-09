@@ -67,14 +67,14 @@ was used to construct an AST for each file, and traverse it to identify `break`,
 `continue` and `return` statements which are directly inside a `finally` block.
 By *directly*, I mean that the script looks for things like
 
-```pycon
+```python
     finally:
         return 42  / break / continue
 ```
 
 and not situations where a `return` exits a function defined in the `finally` block:
 
-```pycon
+```python
     finally:
         def f():
             return 42
@@ -83,7 +83,7 @@ and not situations where a `return` exits a function defined in the `finally` bl
 
 or a `break` or `continue` relates to a loop which is nested in the `finally` block:
 
-```pycon
+```python
     finally:
         for i in ...:
               break / continue
@@ -123,7 +123,7 @@ These are analyzed in the next section.
 
 Many of the error cases followed this pattern:
 
-```pycon
+```python
     try:
         ...
     except SomeSpecificError:
@@ -145,7 +145,7 @@ raised from within the `except` block, and this is probably not the intention
 
 Another variation on the issue found in real code looks like this:
 
-```pycon
+```python
         try:
             ...
         except:
@@ -198,7 +198,7 @@ variable in the `finally` clause, and dedent the return statement.
 there is a `finally` block that contains only `return False`. It could be replaced
 by
 
-```pycon
+```python
     except BaseException:
         pass
     return False
@@ -227,7 +227,7 @@ block and achieve the same effect.
 there is a `finally` that contains only a `break` instruction. Assuming that it was the intention
 to swallow all exceptions, it can be replaced by
 
-```pycon
+```python
     except BaseException:
          pass
     break

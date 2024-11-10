@@ -30,7 +30,7 @@ mentions that
 from the finally clause’s return statement, not the value from the try clause’s return statement.
 
 Both of these behaviours cause confusion, but the first is particularly dangerous
-becuase a swallowed exception is more likely to slip through testing, than an incorrect
+because a swallowed exception is more likely to slip through testing, than an incorrect
 return value.
 
 In 2019, [PEP 601](https://peps.python.org/pep-0601/) proposed to change Python to emit a

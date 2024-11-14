@@ -158,6 +158,13 @@ Here the intention seems to be to return `NotImplemented` when an exception is
 raised, but the `return` in the `finally` block would override the one in the
 `except` block.
 
+> [!NOTE]
+> Following [the discussion](https://discuss.python.org/t/an-analysis-of-return-in-finally-in-the-wild/70633/15),
+> I repeated the analysis on a random selection of PyPI packages (to
+> analyze code written by *average* programmers). The sample contained
+> in total 77,398,892 lines of code with 316 instances of `return`/`break`/`continue`
+> in `finally`. So about 4 instances per million lines of code.
+
 ### Author reactions
 
 Of the 149 incorrect instances of `return` or `break` in a `finally` clause, 27

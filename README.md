@@ -1,6 +1,7 @@
 # `return` in `finally` considered harmful
 
 Irit Katriel
+Nov 9 2024
 
 [Discussion link](https://discuss.python.org/t/an-analysis-of-return-in-finally-in-the-wild/70633).
 
@@ -198,8 +199,9 @@ making these changes ourselves.
 there is a return in a finally at the end of the `main` function, after an `except:`
 clause which swallows all exceptions. The return in the finally would swallow
 an exception raised from within the `except:` clause, but this seems to be the
-intention in this code. A possible fix would be to assign the return value to a
-variable in the `finally` clause, and dedent the return statement.
+intention. A possible fix would be to assign the return value to a variable in
+the `finally` clause, dedent the return statement and wrap the body of the `except:`
+clause by another `try`-`except` that would swallow exceptions from it.
 
 - In [webtest](https://github.com/Pylons/webtest/blob/617a2b823c60e8d7c5f6e12a220affbc72e09d7d/webtest/http.py#L131)
 there is a `finally` block that contains only `return False`. It could be replaced
@@ -227,7 +229,7 @@ exited the `finally` clause.
 
 - In [aws-sam-cli](https://github.com/aws/aws-sam-cli/blob/97e63dcc2738529eded8eecfef4b875abc3a476f/samcli/local/apigw/local_apigw_service.py#L721) there is a conditional return at the end of the block.
 From reading the code, it seems that the condition only holds when the exception has
-been handled (. And yet, the conditional block can just move outside of the `finally`
+been handled. The conditional block can just move outside of the `finally`
 block and achieve the same effect.
 
 - In [scrappy](https://github.com/scrapy/scrapy/blob/52c072640aa61884de05214cb1bdda07c2a87bef/scrapy/utils/gz.py#L27)

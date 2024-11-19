@@ -90,7 +90,7 @@ or a `break` or `continue` relates to a loop which is nested in the `finally` bl
               break / continue
 ```
 
-I then found the current source code for each occurence, and categorized it. For
+I then found the current source code for each occurrence, and categorized it. For
 cases where the code seems incorrect, I created an issue in the project's bug
 tracker. The responses to these issues are also part of the data collected in
 this investigation.
@@ -176,7 +176,7 @@ authors to the problems. Within two weeks, 40 of the 73 issues received a reacti
 from the code maintainers:
 
 - 15 issues had a PR opened to fix the problem.
-- 20 received reactions acknowleding the problem as one worth looking into.
+- 20 received reactions acknowledging the problem as one worth looking into.
 - 3 replied that the code is no longer maintained so this won't be fixed.
 - 2 closed the issue as "works as intended", one said that they intend to
 swallow all exceptions, but the other seemed unaware of the distinction

@@ -92,8 +92,18 @@ class Reporter:
             # print(f'>>>   {type(e)} in ast.parse() for {filename}')
             return
 
+        old = len(self.findings)
         Visitor(source, filename, self.findings).visit(a)
         self.lines += len(source.split(b'\n'))
+        new = len(self.findings)
+        if new > old:
+            self.print_stats()
+
+    def print_stats(self):
+        lines = self.lines
+        results = len(self.findings)
+        in_site_packages = len([x for x in self.findings if 'site-packages' in x[0]])
+        print(f"{lines=} {results=} {in_site_packages=}")
 
     def file_report(self, filename, verbose):
         try:
@@ -158,7 +168,10 @@ def main():
     for filename in expand_globs(filenames):
         if os.path.isfile(filename):
             if filename.endswith(".tar.gz"):
-                reporter.tarball_report(filename, verbose)
+                try:
+                    reporter.tarball_report(filename, verbose)
+                except tarfile.ReadError:
+                    pass
             else:
                 reporter.file_report(filename, verbose)
         elif os.path.isdir(filename):
@@ -170,7 +183,8 @@ def main():
         else:
             print(f"{filename}: Cannot open")
 
-    print(f'total lines: {reporter.lines}')
+    print("-----------------------------------------\nIn Total:")
+    reporter.print_stats()
 
 if __name__ == "__main__":
     main()
